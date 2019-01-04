@@ -19,7 +19,7 @@ It's a typical evening at the bar and a disgruntled local has once again drank f
 #### 6. When an object is kicked with correct alignment, destroy the Enemy and end the game.
 #### 7. If the Player character "touches" the Enemy, kill the Player.
 
-### Wireframe
+### [Wireframe](/Wireframe.png)
 
 
 ## Advanced Requirements
