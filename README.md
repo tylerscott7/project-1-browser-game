@@ -7,6 +7,8 @@ You're in the 1989 thriller movie, "Road House". You are a bouncer with a partic
 
 It's a typical evening at the bar and a disgruntled local has once again drank far too many Busch Lites. It's time for you to subdue the threat. Unfortunately, he is far too large to engage in hand-to-hand combat, so you must roadhouse kick objects at your disposal sitting in the bar. Get too close to the belligerent customer and he may wreck your pretty face. Be sure to align Patrick correctly in order to kick the projectiles in the correct direction!
 
+#### [Wireframe](/Wireframe.png)
+
 ## Basic Requirements (MVP)
 #### 1. Create a Player and an Enemy class to be instantiated.
 - When the game starts, a Player and Enemy should be instantiated and displayed on the screen.
@@ -22,7 +24,6 @@ It's a typical evening at the bar and a disgruntled local has once again drank f
 - The object is intended to fly toward the Enemy and defeat them.
 #### 7. If the Player character "touches" the Enemy, kill/harm the Player.
 #### 8. Player loses if all chairs are kicked and miss.
-### [Wireframe](/Wireframe.png)
 
 
 ## Advanced Requirements
