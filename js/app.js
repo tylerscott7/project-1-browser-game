@@ -5,6 +5,84 @@ const mapW = 10, mapH = 10;
 let currentSecond = 0, frameCount = 0, framesLastSecond = 0;
 let lastFrameTime = 0;
 let enemySpeed = null;
+const tileMapSrc = "assets/tileset/PNG/32x32/open_tileset.png";
+const chairIndex = {
+    x: 320,
+    y: 448,
+    w: 31,
+    h: 32,
+}
+const tableIndex = {
+    x: 320,
+    y: 416,
+    w: 32,
+    h: 32,
+}
+const barTopIndex = {
+    x: 384,
+    y: 416,
+    w: 32,
+    h: 32,
+}
+const barBotIndex = {
+    x: 384,
+    y: 64,
+    w: 32,
+    h: 32,
+}
+const barCornerIndex = {
+    x: 352,
+    y: 384,
+    w: 64,
+    h: 32,
+}
+const barRightIndex = {
+    x: 64,
+    y: 416,
+    w: 32,
+    h: 32,
+}
+const barFloorIndex = {
+    x: 192,
+    y: 0,
+    w: 32,
+    h: 32,
+}
+const barWideIndex = {
+    // Index of -2
+    x: 370,
+    y: 384,
+    w: 32,
+    h: 32,
+}
+const barLeftIndex = {
+    // Index of -1
+    x: 352,
+    y: 384,
+    w: 32,
+    h: 32,
+}
+const barLongIndex = {
+    // Index of -3
+    x: 96,
+    y: 416,
+    w: 32,
+    h: 32,
+}
+const playerIndex = {
+    // Index of -3
+    x: 320,
+    y: 384,
+    w: 32,
+    h: 32,
+}
+const barrelIndex = {
+    // Index of -3
+    x: 192,
+    y: 384,
+    w: 32,
+    h: 32,
+}
 
 let keysDown = {
     37: false,
@@ -12,6 +90,19 @@ let keysDown = {
     39: false,
     40: false,
 };
+
+const tileMap = [
+    1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,
+    -1,-2,1,1,1,1,1,1,1,1,
+    1,-3,1,1,1,1,1,1,1,1,
+    1,-3,1,1,1,1,1,1,1,1,
+    1,-3,1,1,1,1,1,1,1,1,
+    1,-3,1,1,1,1,1,1,1,1,
+    1,-3,1,1,1,1,1,1,1,1,
+    1,-2,-2,-2,1,1,1,1,1,1,
+    1,1,1,-3,1,1,1,1,1,1,
+]
 
 const gameMap = [
     1,1,1,1,1,1,1,1,1,1,
@@ -51,12 +142,45 @@ window.onload = function(){
 function drawLevel(){
     for (let y=0;y<mapH; y++){
         for (let x=0; x<mapW; x++){
-            switch(gameMap[((y*mapH)+x)]){
+            switch(tileMap[((y*mapH)+x)]){
+                case -3:
+                    var img = new Image();
+                    img.src = tileMapSrc;
+                    img.onload = function(){
+                        ctx.drawImage(img,barLongIndex.x,barLongIndex.y,barLongIndex.w, barLongIndex.h, x*40, y*40, 40, 40);
+                    };
+                    break;
+                case -2:
+                    var img = new Image();
+                    img.src = tileMapSrc;
+                    img.onload = function(){
+                        ctx.drawImage(img,barWideIndex.x,barWideIndex.y,barWideIndex.w, barWideIndex.h, x*40, y*40, 40, 40);
+                    };
+                    break;
+                case -1:
+                    var img = new Image();
+                    img.src = tileMapSrc;
+                    img.onload = function(){
+                        ctx.drawImage(img,barLeftIndex.x,barLeftIndex.y,barLeftIndex.w, barLeftIndex.h, x*40, y*40, 40, 40);
+                    };
+                    break;
                 case 0:
-                    ctx.fillStyle = "#999999";
+                    var img = new Image();
+                    img.src = tileMapSrc;
+                    img.onload = function(){
+                        ctx.drawImage(img,chairIndex.x,chairIndex.y,chairIndex.w, chairIndex.h, x*40, y*40, 40, 40);
+                    };
+                    
+                    // ctx.fillStyle = "#999999";
+                    console.log("should be drawing an image...");
                     break;
                 default:
-                    ctx.fillStyle = "#eeeeee";
+                    // ctx.fillStyle = "#eeeeee";
+                    var img = new Image();
+                    img.src = tileMapSrc;
+                    img.onload = function(){
+                        ctx.drawImage(img,barFloorIndex.x,barFloorIndex.y,barFloorIndex.w, barFloorIndex.h, x*40, y*40, 40, 40);
+                    };
             }
             ctx.fillRect(x*tileW, y*tileH, tileW, tileH);
         }
@@ -78,18 +202,31 @@ function drawGame(){
         frameCount++;
     }
 
-    ctx.fillStyle = "#ff0000";
+    // ctx.fillStyle = "#ff0000";
     // ctx.fillText("FPS: " + framesLastSecond, 10, 20);
 
     // PUT PLAYER ON SCREEN
     if (player.alive){
-        ctx.fillRect(player.positionX*tileW,player.positionY*tileH,tileW,tileH);
+        var img = new Image();
+        img.src = tileMapSrc;
+        img.onload = function(){
+            ctx.drawImage(img,playerIndex.x,playerIndex.y,playerIndex.w, playerIndex.h, player.positionX*tileW, player.positionY*tileH, 40, 40);
+        };
+        // ctx.fillRect(player.positionX*tileW,player.positionY*tileH,tileW,tileH);
+        // var img = new Image();
+        // img.src = tileMapSrc;
+        // img.onload = function(){
+        //     ctx.drawImage(img,chairIndex.x,chairIndex.y,chairIndex.w, chairIndex.h, x*40, y*40, 40, 40);
+        // };
     }
 
     // PUT ENEMY ON SCREEN
     if (enemy.health){
-        ctx.fillStyle = "#000000";
-        ctx.fillRect(enemy.positionX*tileW,enemy.positionY*tileH,tileW,tileH);  
+        var img = new Image();
+        img.src = tileMapSrc;
+        img.onload = function(){
+            ctx.drawImage(img,barrelIndex.x,barrelIndex.y,barrelIndex.w, barrelIndex.h, enemy.positionX*tileW, enemy.positionY*tileH, 40, 40);
+        };
     }
 
     // UPDATE CHAIR POSITIONS AND COLLISIONS
@@ -97,7 +234,12 @@ function drawGame(){
     // ITERATE THROUGH ARRAY OF CHAIRS
     for (let i=0; i<chairs.length; i++){
         if (!chairs[i].destroyed){
-        ctx.fillRect(chairs[i].positionX*tileW,chairs[i].positionY*tileH,tileW,tileH);
+        // ctx.fillRect(chairs[i].positionX*tileW,chairs[i].positionY*tileH,tileW,tileH);
+        var img = new Image();
+        img.src = tileMapSrc;
+        img.onload = function(){
+            ctx.drawImage(img,chairIndex.x,chairIndex.y,chairIndex.w, chairIndex.h, chairs[i].positionX*tileW, chairs[i].positionY*tileH, 40, 40);
+        };
         }
     }
 
@@ -119,6 +261,8 @@ function playerEnemyContact() {
 
 // SET UP PLAYER CLASS AND INSTANTIATE
 function Character() {
+    this.img = new Image();
+    this.img.src = tileMapSrc;
     this.positionX = 5;
     this.positionY = 9;
     this.alive = true;
@@ -168,8 +312,16 @@ function Character() {
     }
     this.clearPrevPos = function(){
         // CLEARS PREVIOUS POSITION ON SCREEN AND UPDATES COLLISION MAP
-        ctx.fillStyle = "#eeeeee";
-        ctx.fillRect(this.positionX*tileW,this.positionY*tileH,tileW,tileH);
+        // ctx.fillStyle = "#eeeeee";
+        // ctx.fillRect(this.positionX*tileW,this.positionY*tileH,tileW,tileH);
+        // var img = new Image();
+        // img.src = tileMapSrc;
+        console.log("Should be drawing the floor...")
+        // this.img.onload = function(){
+        //     ctx.drawImage(img,barFloorIndex.x,barFloorIndex.y,barFloorIndex.w, barFloorIndex.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
+        //     ctx.clearRect(this.positionX*tileW,this.positionY*tileH,tileW,tileH);
+        // };
+        ctx.drawImage(this.img,barFloorIndex.x,barFloorIndex.y,barFloorIndex.w, barFloorIndex.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
         gameMap[(this.positionY*mapH)+this.positionX] = 1;
     }
     this.kick = function(){
@@ -261,6 +413,8 @@ function Character() {
 }
 let player = new Character();
 function Enemy() {
+    this.img = new Image();
+    this.img.src = tileMapSrc;
     this.positionX = 1;
     this.positionY = 1;
     this.health = 2;
@@ -288,7 +442,7 @@ function Enemy() {
     }
     this.clearPrevPos = () => {
         // CLEARS PREVIOUS POSITION ON SCREEN AND UPDATES COLLISION MAP
-        ctx.fillRect(this.positionX*tileW,this.positionY*tileH,tileW,tileH);
+        ctx.drawImage(this.img,barFloorIndex.x,barFloorIndex.y,barFloorIndex.w, barFloorIndex.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
         gameMap[(this.positionY*mapH)+this.positionX] = 1;
     }
     this.moveRandom = () => {
@@ -301,7 +455,7 @@ function Enemy() {
             const randDir = Math.floor(Math.random()*this.degFreedom.length);
             const moveDir = this.degFreedom[randDir];
             console.log(`X:${enemy.positionX} Y: ${enemy.positionY}`)
-            ctx.fillStyle = "#eeeeee"
+            // ctx.fillStyle = "#eeeeee"
             switch (moveDir){
                 case 0:
                     if (this.positionX < mapW-1  && gameMap[(this.positionY*mapH)+this.positionX+1]){
@@ -385,6 +539,8 @@ function spawnObstacles(){
 
 class Chair {
     constructor(x,y){
+        this.img = new Image();
+        this.img.src = tileMapSrc;
         this.positionX = x
         this.positionY = y
         this.velocityX = 0
@@ -395,10 +551,9 @@ class Chair {
     moveLeft(){
         // CHECK IF POSSIBLE
         if (this.positionX && gameMap[(this.positionY*mapH)+this.positionX-1]){
-            // CURRENT POSITION BECOMES TRAVERSABLE
+            // CURRENT POSITION BECOMES TRAVERSABLE AND CHAIR IS REMOVED
             gameMap[((this.positionY)*mapH)+(this.positionX)] = 1;
-            ctx.fillStyle = "#eeeeee";
-            ctx.fillRect(this.positionX*tileW,this.positionY*tileH,tileW,tileH);
+            ctx.drawImage(this.img,barFloorIndex.x,barFloorIndex.y,barFloorIndex.w, barFloorIndex.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
             // UPDATE THE NEW POSITION
             this.positionX --;
             // NEW POSITION IS NON-TRAVERSABLE
@@ -409,8 +564,7 @@ class Chair {
         if (this.positionX < mapW-1 && gameMap[(this.positionY*mapH)+this.positionX+1]){
             // CURRENT POSITION BECOMES TRAVERSABLE
             gameMap[((this.positionY)*mapH)+(this.positionX)] = 1;
-            ctx.fillStyle = "#eeeeee";
-            ctx.fillRect(this.positionX*tileW,this.positionY*tileH,tileW,tileH);
+            ctx.drawImage(this.img,barFloorIndex.x,barFloorIndex.y,barFloorIndex.w, barFloorIndex.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
             // UPDATE THE NEW POSITION
             this.positionX ++;
             // NEW POSITION IS NON-TRAVERSABLE
@@ -421,8 +575,7 @@ class Chair {
         if (this.positionY && gameMap[((this.positionY-1)*mapH)+this.positionX]){
             // CURRENT POSITION BECOMES TRAVERSABLE
             gameMap[((this.positionY)*mapH)+(this.positionX)] = 1;
-            ctx.fillStyle = "#eeeeee";
-            ctx.fillRect(this.positionX*tileW,this.positionY*tileH,tileW,tileH);
+            ctx.drawImage(this.img,barFloorIndex.x,barFloorIndex.y,barFloorIndex.w, barFloorIndex.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
             // UPDATE THE NEW POSITION
             this.positionY --;
             // NEW POSITION IS NON-TRAVERSABLE
@@ -433,8 +586,7 @@ class Chair {
         if (this.positionY < mapH -1 && gameMap[((this.positionY+1)*mapH)+this.positionX]){
             // CURRENT POSITION BECOMES TRAVERSABLE
             gameMap[((this.positionY)*mapH)+(this.positionX)] = 1;
-            ctx.fillStyle = "#eeeeee";
-            ctx.fillRect(this.positionX*tileW,this.positionY*tileH,tileW,tileH);
+            ctx.drawImage(this.img,barFloorIndex.x,barFloorIndex.y,barFloorIndex.w, barFloorIndex.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
             // UPDATE THE NEW POSITION
             this.positionY ++;
             // NEW POSITION IS NON-TRAVERSABLE
@@ -460,13 +612,11 @@ class Chair {
                     enemy.health --;
                     console.log(`The Enemy health is now: ${enemy.health}`);
                     if (!enemy.health){
-                        ctx.fillStyle = "#eeeeee";
-                        ctx.fillRect((chairObj.positionX+velX)*tileW,(chairObj.positionY+velY)*tileH,tileW,tileH);
+                        ctx.drawImage(this.img,barFloorIndex.x,barFloorIndex.y,barFloorIndex.w, barFloorIndex.h, (chairObj.positionX+velX)*tileW, (chairObj.positionY+velY)*tileH, 40, 40);
                         gameMap[((enemy.positionY)*mapH)+(enemy.positionX)] = 1;
                     }
                 }
-                ctx.fillStyle = "#eeeeee";
-                ctx.fillRect(chairObj.positionX*tileW,chairObj.positionY*tileH,tileW,tileH);
+                ctx.drawImage(this.img,barFloorIndex.x,barFloorIndex.y,barFloorIndex.w, barFloorIndex.h, (chairObj.positionX)*tileW, (chairObj.positionY)*tileH, 40, 40);
                 clearInterval(interval);
                 gameMap[((chairObj.positionY)*mapH)+(chairObj.positionX)] = 1;
                 chairs[chairIndex].destroyed = true;
@@ -474,8 +624,7 @@ class Chair {
             // MOVE CHAIR IF NOT DESTROYED AND UPDATE COLLSION
             else {
                 gameMap[((chairObj.positionY)*mapH)+(chairObj.positionX)] = 1;
-                ctx.fillStyle = "#eeeeee";
-                ctx.fillRect(chairObj.positionX*tileW,chairObj.positionY*tileH,tileW,tileH);
+                ctx.drawImage(this.img,barFloorIndex.x,barFloorIndex.y,barFloorIndex.w, barFloorIndex.h, (chairObj.positionX)*tileW, (chairObj.positionY)*tileH, 40, 40);
                 this.positionX += velX;
                 this.positionY += velY;
                 gameMap[((chairObj.positionY)*mapH)+(chairObj.positionX)] = 0;

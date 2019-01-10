@@ -1,0 +1,9 @@
+b2e5241-2
+- Added plain & nerdy_guy characters from silveiraneto.net
+
+
+b2e5241-1
+- Initial collection for OpenGameArt.org
+- Added tilesets & sprites from:
+  - http://silveiraneto.net/
+  - https://github.com/silveira/openpixels
