@@ -8,8 +8,37 @@
     <title>Document</title>
 </head>
 <body>
-    <canvas id="game" height="400px" width="400px"></canvas>
-
+    <div id="container">
+        <h1>ROAD HOUSE</h1>
+        <h3>Projecting chairs at the thug with your roundhouse kick!</h3>
+        <h4>Note: Don't get too close to the thug!</h4>
+        <h4 id="enemyHealth"></h4>
+        <div id="deathScreen">
+            <h1> YOU DIED! </h1>
+        </div> 
+        <canvas id="game" height="400px" width="400px">
+        </canvas> 
+        <aside>
+            <div id="controls">
+                <div id="playerMove">
+                    <h4>MOVE PLAYER</h4>
+                    <img src="assets/arrow_keys.png" style="width:100px; height:65px;">
+                </div>
+                <div id="playerKick">
+                    <h4>KICK CHAIR</h4>
+                    <img src="assets/PixelArt.png" style="width:100px; height:30px;">
+                </div>
+                <div id="restock">
+                    <h4>RESTOCK <br> CHAIRS</h4>
+                    <img src="assets/PixelArt.png" style="width:100px; height:30px;">
+                    <h4> @ </h4>
+                    <img src="assets/chair.png" style="width:30px; height:30px;">
+                    <p>(Use all chairs first)</p>
+                </div>
+            </div>  
+        </aside>
+    </div>
+    
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
     <script src="js/app.js"></script>
 </body>

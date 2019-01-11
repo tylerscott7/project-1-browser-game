@@ -1,0 +1,42 @@
+#game, aside{
+    display:inline-block;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+}
+
+aside div div{
+    margin-bottom: 10px;
+    display:block;
+    width: 130px;
+    border: 2px solid black;
+    padding-bottom: 10px;
+}
+
+#container {
+    display: block;
+    margin: 0 auto;
+    width: 550px;
+}
+
+h4, h1, h3 {
+    text-align: center;
+    margin: 5px;
+}
+
+img {
+    display: block;
+    margin: 0 auto;
+}
+
+#enemyHealth {
+    position: absolute;
+}
+
+#deathScreen {
+    position:absolute;
+    background-color:white;
+    width:400px;
+    height:400px;
+    visibility: hidden;
+}
