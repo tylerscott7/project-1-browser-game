@@ -104,6 +104,7 @@ const enemyIndex = {
     w: 35,
     h: 35,
 }
+const chairs = [];
 
 // SPRITE MAP
 const tileMap = [
@@ -147,13 +148,40 @@ const obstacleMap = [
     0,0,0,0,0,0,0,0,0,0,
 ]
 
+// MAKE CHARACTERS
+const player = new Character();
+const enemy = new Enemy();
+
 window.onload = function(){
+    // get canvas
     ctx = document.getElementById('game').getContext('2d');
-    drawLevel();
-    requestAnimationFrame(drawGame);
     ctx.font = "bold 10pt sans-serif";
+    // draw tilemap and enemy health
+    drawLevel();
+    $('#enemyHealth').text(`Enemy Health: ${enemy.health}`);
+    // render characters and start enemy movement
+    requestAnimationFrame(drawGame);
+    enemy.updateDegFreedom();
+    enemy.moveRandom();
+    // spawn chairs
     spawnObstacles();
 }
+
+// SET UP USER INPUT
+$('body').on('keydown', function(e) {
+    ctx.fillStyle = "#eeeeee";
+    if (e.which == 37){
+        player.moveLeft();
+    } else if (e.keyCode == 38){
+        player.moveUp();
+    } else if (e.keyCode == 39){
+        player.moveRight();
+    } else if (e.keyCode == 40){
+        player.moveDown();
+    } else if (e.keyCode == 32){
+        player.kick();
+    }
+});
 
 // DRAW INITIAL MAP
 function drawLevel(){
@@ -208,23 +236,8 @@ function drawLevel(){
     }
 }
 
-// GAME LOOP FUNCTION
+// RENDER FUNCTION
 function drawGame(){
-    if (ctx == null){
-        return;
-    }
-    let sec = Math.floor(Date.now()/1000);
-    if (sec != currentSecond){
-        currentSecond = sec;
-        framesLastSecond = frameCount;
-        frameCount = 1;
-    }
-    else {
-        frameCount++;
-    }
-
-    // ctx.fillStyle = "#ff0000";
-    // ctx.fillText("Enemy Health: " + enemy.health, 10, 20);
 
     // PUT PLAYER ON SCREEN
     if (player.alive && enemy.health <= 0){
@@ -236,12 +249,6 @@ function drawGame(){
             ctx.drawImage(img2,barFloor2Index.x,barFloor2Index.y,barFloor2Index.w, barFloor2Index.h, player.positionX*tileW, player.positionY*tileH, 40, 40);
             ctx.drawImage(img,playerCheerIndex.x,playerCheerIndex.y,playerCheerIndex.w, playerCheerIndex.h, player.positionX*tileW+5, player.positionY*tileH+6, 30, 30);
         };
-        // ctx.fillRect(player.positionX*tileW,player.positionY*tileH,tileW,tileH);
-        // var img = new Image();
-        // img.src = tileMapSrc;
-        // img.onload = function(){
-        //     ctx.drawImage(img,chairIndex.x,chairIndex.y,chairIndex.w, chairIndex.h, x*40, y*40, 40, 40);
-        // };
     } else if (player.alive){
         let img = new Image();
         img.src = characterSrc;
@@ -260,36 +267,23 @@ function drawGame(){
     }
 
     // UPDATE CHAIR POSITIONS AND COLLISIONS
-    ctx.fillStyle = "#773D0C";
-    // ITERATE THROUGH ARRAY OF CHAIRS
+        // iterate through array of chairs
     for (let i=0; i<chairs.length; i++){
         if (!chairs[i].destroyed){
-        // ctx.fillRect(chairs[i].positionX*tileW,chairs[i].positionY*tileH,tileW,tileH);
-        var img = new Image();
-        img.src = tileMapSrc;
-        img.onload = function(){
-            ctx.drawImage(img,chairIndex.x,chairIndex.y,chairIndex.w, chairIndex.h, chairs[i].positionX*tileW+5, chairs[i].positionY*tileH+5, 30, 30);
-        };
+            var img = new Image();
+            img.src = tileMapSrc;
+            img.onload = function(){
+                ctx.drawImage(img,chairIndex.x,chairIndex.y,chairIndex.w, chairIndex.h, chairs[i].positionX*tileW+5, chairs[i].positionY*tileH+5, 30, 30);
+            };
         }
     }
 
     requestAnimationFrame(drawGame);
 }
 
-// EVERY TIME THE ENEMY AND PLAYER MOVE, CHECK FOR PLAYER DEATH
-function playerEnemyContact() {
-    let playerX = player.positionX, playerY = player.positionY, enemyX = enemy.positionX, enemyY = enemy.positionY;
-    // IF X AND Y ARE WITHIN 1 SPACE
-    if (((Math.abs(enemyX-playerX)==0 && Math.abs(enemyY-playerY)<2) || (Math.abs(enemyY-playerY)==0 && Math.abs(enemyX-playerX)<2)) && enemy.health){
-        // KILL THE PLAYER
-        player.clearPrevPos();
-        player.alive = false;
-        $('#deathScreen').css("visibility","visible");
-    }
-}
-
-// SET UP PLAYER CLASS AND INSTANTIATE
+// SET UP CLASSES
 function Character() {
+    this.speed = 10;
     this.img = new Image();
     this.img.src = tileMapSrc;
     this.positionX = 5;
@@ -443,8 +437,9 @@ function Character() {
         playerEnemyContact();
     }
 }
-let player = new Character();
+
 function Enemy() {
+    this.speed = 10;
     this.img = new Image();
     this.img.src = tileMapSrc;
     this.positionX = 1;
@@ -529,45 +524,6 @@ function Enemy() {
             }
             playerEnemyContact();
         },1000);
-    }
-}
-
-let enemy = new Enemy();
-$('#enemyHealth').text(`Enemy Health: ${enemy.health}`);
-enemy.updateDegFreedom();
-enemy.moveRandom();
-const chairs = [];
-
-// SET UP USER INPUT
-$('body').on('keydown', function(e) {
-    ctx.fillStyle = "#eeeeee";
-    if (e.which == 37){
-        player.moveLeft();
-    } else if (e.keyCode == 38){
-        player.moveUp();
-    } else if (e.keyCode == 39){
-        player.moveRight();
-    } else if (e.keyCode == 40){
-        player.moveDown();
-    } else if (e.keyCode == 32){
-        player.kick();
-    }
-});
-
-// SPAWN CHAIRS
-function spawnObstacles(){
-    for (let i=0; i<3; i++){
-        // CLEAR CHAIR ARRAY
-        // RAND #s BASED ON OBSTACLE MAP TO AVOID EDGES
-        let randX = Math.floor(Math.random()*6)+3;
-        let randY = Math.floor(Math.random()*8)+1;
-        while (!gameMap[(randY*mapH)+randX]){
-            randX = Math.floor(Math.random()*6)+3;
-            randY = Math.floor(Math.random()*8)+1;
-        }
-        let chair = new Chair(randX,randY);
-        gameMap[(randY*mapH)+randX] = 0;
-        chairs.push(chair);
     }
 }
 
@@ -670,6 +626,31 @@ class Chair {
     }
 }
 
-// SET UP TITLE SCREEN
+// SPAWN CHAIRS
+function spawnObstacles(){
+    for (let i=0; i<3; i++){
+        // CLEAR CHAIR ARRAY
+        // RAND #s BASED ON OBSTACLE MAP TO AVOID EDGES
+        let randX = Math.floor(Math.random()*6)+3;
+        let randY = Math.floor(Math.random()*8)+1;
+        while (!gameMap[(randY*mapH)+randX]){
+            randX = Math.floor(Math.random()*6)+3;
+            randY = Math.floor(Math.random()*8)+1;
+        }
+        let chair = new Chair(randX,randY);
+        gameMap[(randY*mapH)+randX] = 0;
+        chairs.push(chair);
+    }
+}
 
-
+// EVERY TIME THE ENEMY AND PLAYER MOVE, CHECK FOR PLAYER DEATH
+function playerEnemyContact() {
+    let playerX = player.positionX, playerY = player.positionY, enemyX = enemy.positionX, enemyY = enemy.positionY;
+    // IF THEY ARE WITHIN 1 SPACE (NOT DIAGONAL DIRECTION)
+    if (((Math.abs(enemyX-playerX)==0 && Math.abs(enemyY-playerY)<2) || (Math.abs(enemyY-playerY)==0 && Math.abs(enemyX-playerX)<2)) && enemy.health){
+        // KILL THE PLAYER
+        player.clearPrevPos();
+        player.alive = false;
+        $('#deathScreen').css("visibility","visible");
+    }
+}
