@@ -1,5 +1,7 @@
 // GLOBAL CONSTANTS
-let ctx = null;
+let ctx = null;     // background
+let ctx2 = null;    // foreground
+
 const tileW = 40, tileH = 40;
 const mapW = 10, mapH = 10;
 let currentSecond = 0, frameCount = 0, framesLastSecond = 0;
@@ -154,8 +156,10 @@ const enemy = new Enemy();
 
 window.onload = function(){
     // get canvas
-    ctx = document.getElementById('game').getContext('2d');
+    ctx2 = document.getElementById('game').getContext('2d');
+    ctx = document.getElementById('background').getContext('2d');
     ctx.font = "bold 10pt sans-serif";
+    ctx2.font = "bold 10pt sans-serif";
     // draw tilemap and enemy health
     drawLevel();
     $('#enemyHealth').text(`Enemy Health: ${enemy.health}`);
@@ -240,6 +244,7 @@ function drawLevel(){
 function drawGame(){
 
     // PUT PLAYER ON SCREEN
+        // cheering sprite
     if (player.alive && enemy.health <= 0){
         let img = new Image();
         img.src = characterSrc;
@@ -247,13 +252,14 @@ function drawGame(){
         img2.src = tileMapSrc;
         img.onload = function(){
             ctx.drawImage(img2,barFloor2Index.x,barFloor2Index.y,barFloor2Index.w, barFloor2Index.h, player.positionX*tileW, player.positionY*tileH, 40, 40);
-            ctx.drawImage(img,playerCheerIndex.x,playerCheerIndex.y,playerCheerIndex.w, playerCheerIndex.h, player.positionX*tileW+5, player.positionY*tileH+6, 30, 30);
+            ctx2.drawImage(img,playerCheerIndex.x,playerCheerIndex.y,playerCheerIndex.w, playerCheerIndex.h, player.positionX*tileW+5, player.positionY*tileH+6, 30, 30);
         };
+        // regular sprite
     } else if (player.alive){
         let img = new Image();
         img.src = characterSrc;
         img.onload = function(){
-            ctx.drawImage(img,playerIndex.x,playerIndex.y,playerIndex.w-1, playerIndex.h, player.positionX*tileW+1, player.positionY*tileH+6, 30, 30);
+            ctx2.drawImage(img,playerIndex.x,playerIndex.y,playerIndex.w-1, playerIndex.h, player.positionX*tileW+1, player.positionY*tileH+6, 30, 30);
         };
     }
 
@@ -262,20 +268,18 @@ function drawGame(){
         let img = new Image();
         img.src = characterSrc;
         img.onload = function(){
-            ctx.drawImage(img,enemyIndex.x,enemyIndex.y,enemyIndex.w, enemyIndex.h, enemy.positionX*tileW-5, enemy.positionY*tileH, 40, 40);
+            ctx2.drawImage(img,enemyIndex.x,enemyIndex.y,enemyIndex.w, enemyIndex.h, enemy.positionX*tileW-5, enemy.positionY*tileH, 40, 40);
         };
     }
 
     // UPDATE CHAIR POSITIONS AND COLLISIONS
         // iterate through array of chairs
     for (let i=0; i<chairs.length; i++){
-        if (!chairs[i].destroyed){
-            var img = new Image();
-            img.src = tileMapSrc;
-            img.onload = function(){
-                ctx.drawImage(img,chairIndex.x,chairIndex.y,chairIndex.w, chairIndex.h, chairs[i].positionX*tileW+5, chairs[i].positionY*tileH+5, 30, 30);
-            };
-        }
+        var img = new Image();
+        img.src = tileMapSrc;
+        img.onload = function(){
+            ctx2.drawImage(img,chairIndex.x,chairIndex.y,chairIndex.w, chairIndex.h, chairs[i].positionX*tileW+5, chairs[i].positionY*tileH+5, 30, 30);
+        };
     }
 
     requestAnimationFrame(drawGame);
@@ -337,7 +341,8 @@ function Character() {
 
     }
     this.clearPrevPos = function(){
-        ctx.drawImage(this.img,barFloor2Index.x,barFloor2Index.y,barFloor2Index.w, barFloor2Index.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
+        ctx2.clearRect(this.positionX*tileW, this.positionY*tileH, 40, 40);
+        // ctx2.drawImage(this.img,barFloor2Index.x,barFloor2Index.y,barFloor2Index.w, barFloor2Index.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
         gameMap[(this.positionY*mapH)+this.positionX] = 1;
     }
     this.kick = function(){
@@ -366,18 +371,17 @@ function Character() {
                             velY = 1;
                         }
                         // CALL TRAJECTORY ON SAID CHAIR TO MOVE
-                        chairs[chairIndex].trajectory(chairIndex, velX, velY);
+                        chairs[chairIndex].trajectory(velX, velY);
                     }
 
                     // NOW CHECK FOR THE CHAIR STACK (AND AN EMPTY CHAIR ARRAY?)
-                    if (x == 9 && y==9){
-                        for (let i=0; i<chairs.length;i++){
-                            if (chairs[i].destroyed == false){
-                                return;
-                            } else if (i== chairs.length-1){
-                                spawnObstacles();
-                            };
-                        }
+                    if (x == 9 && y==9 && !chairs.length){
+                        // for (let i=0; i<chairs.length;i++){
+                        //     if (chairs[i].destroyed == false){
+                        //         return;
+                        //     } else if (i== chairs.length-1){
+                        spawnObstacles();
+                            // };
                     }
                 }
             }
@@ -385,7 +389,7 @@ function Character() {
     }
     this.moveLeft = function() {
         if (!this.alive){
-            return
+            return;
         }
         if (player.positionX && gameMap[(player.positionY*mapH)+player.positionX-1]){
             this.clearPrevPos();
@@ -399,7 +403,7 @@ function Character() {
     };
     this.moveRight = function() {
         if (!this.alive){
-            return
+            return;
         }
         if (player.positionX < mapW-1  && gameMap[(player.positionY*mapH)+player.positionX+1]){
             this.clearPrevPos();
@@ -447,7 +451,7 @@ function Enemy() {
     this.health = 5;
     this.degFreedom = []; //RIGHT/LEFT/DOWN/UP
     this.destroy = () => {
-        // TO-DO
+        this.clearPrevPos();
     }
     this.updateDegFreedom = () => {
         this.degFreedom = [];
@@ -472,7 +476,7 @@ function Enemy() {
     }
     this.clearPrevPos = () => {
         // CLEARS PREVIOUS POSITION ON SCREEN AND UPDATES COLLISION MAP
-        ctx.drawImage(this.img,barFloor2Index.x,barFloor2Index.y,barFloor2Index.w, barFloor2Index.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
+        ctx2.drawImage(this.img,barFloor2Index.x,barFloor2Index.y,barFloor2Index.w, barFloor2Index.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
         gameMap[(this.positionY*mapH)+this.positionX] = 1;
     }
     this.moveRandom = () => {
@@ -480,49 +484,50 @@ function Enemy() {
             if (this.health == 0){
                 clearInterval(enemySpeed);
                 gameMap[(this.positionY*mapH)+this.positionX] = 1;
+            } else {
+                // MOVEMENT VARIABLE BASED ON DEGREES OF FREEDOM
+                const randDir = Math.floor(Math.random()*this.degFreedom.length);
+                const moveDir = this.degFreedom[randDir];
+                console.log(`Enemy is at : [${enemy.positionX},${enemy.positionY}]`)
+                switch (moveDir){
+                    case 0:
+                        if (this.positionX < mapW-1  && gameMap[(this.positionY*mapH)+this.positionX+1]){
+                            this.clearPrevPos();
+                            this.positionX ++;
+                            this.updateDegFreedom();
+                            gameMap[(this.positionY*mapH)+this.positionX] = 0;
+                        };
+                        break;
+                    case 1:
+                        if (this.positionX && gameMap[(this.positionY*mapH)+this.positionX-1]){
+                            this.clearPrevPos();
+                            this.positionX --;
+                            this.updateDegFreedom();
+                            gameMap[(this.positionY*mapH)+this.positionX] = 0;
+                        };
+                        break;
+                    case 2:
+                        if (this.positionY < mapH-1  && gameMap[((this.positionY+1)*mapH)+this.positionX]){
+                            this.clearPrevPos();
+                            this.positionY ++;
+                            this.updateDegFreedom();
+                            gameMap[(this.positionY*mapH)+this.positionX] = 0;
+                        };
+                        break;
+                    case 3:
+                        if (this.positionY && gameMap[((this.positionY-1)*mapH)+this.positionX]){
+                            this.clearPrevPos();
+                            this.positionY --;
+                            this.updateDegFreedom();
+                            gameMap[(this.positionY*mapH)+this.positionX] = 0;
+                        };
+                        break;
+                    default:
+                        console.log("Default.")
+                        break;
+                }
+                playerEnemyContact();
             }
-            // MOVEMENT VARIABLE BASED ON DEGREES OF FREEDOM
-            const randDir = Math.floor(Math.random()*this.degFreedom.length);
-            const moveDir = this.degFreedom[randDir];
-            console.log(`Enemy is at : [${enemy.positionX},${enemy.positionY}]`)
-            switch (moveDir){
-                case 0:
-                    if (this.positionX < mapW-1  && gameMap[(this.positionY*mapH)+this.positionX+1]){
-                        this.clearPrevPos();
-                        this.positionX ++;
-                        this.updateDegFreedom();
-                        gameMap[(this.positionY*mapH)+this.positionX] = 0;
-                    };
-                    break;
-                case 1:
-                    if (this.positionX && gameMap[(this.positionY*mapH)+this.positionX-1]){
-                        this.clearPrevPos();
-                        this.positionX --;
-                        this.updateDegFreedom();
-                        gameMap[(this.positionY*mapH)+this.positionX] = 0;
-                    };
-                    break;
-                case 2:
-                    if (this.positionY < mapH-1  && gameMap[((this.positionY+1)*mapH)+this.positionX]){
-                        this.clearPrevPos();
-                        this.positionY ++;
-                        this.updateDegFreedom();
-                        gameMap[(this.positionY*mapH)+this.positionX] = 0;
-                    };
-                    break;
-                case 3:
-                    if (this.positionY && gameMap[((this.positionY-1)*mapH)+this.positionX]){
-                        this.clearPrevPos();
-                        this.positionY --;
-                        this.updateDegFreedom();
-                        gameMap[(this.positionY*mapH)+this.positionX] = 0;
-                    };
-                    break;
-                default:
-                    console.log("Default.")
-                    break;
-            }
-            playerEnemyContact();
         },1000);
     }
 }
@@ -536,17 +541,30 @@ class Chair {
         this.velocityX = 0
         this.velocityY = 0
         this.damage = 1;
-        this.destroyed = false;
+    }
+    clearChairFrame(){
+        // UPDATE CURRENT POSITION COLLISION AND IMAGE
+        gameMap[((this.positionY)*mapH)+(this.positionX)] = 1;
+        ctx2.clearRect(this.positionX*tileW, this.positionY*tileH, 40, 40);
     }
     destroy(){
         // TO-DO
+    }
+    edgeOfScreen(object){
+        // check X
+        if (object.posX+object.velX < 0 || object.posX+object.velX > 9){
+            return true;
+        } else if (object.posY+object.velY < 0 || object.posY+object.velY > 9){
+            return true;
+        } else {
+            return false;
+        }
     }
     moveLeft(){
         // CHECK IF POSSIBLE
         if (this.positionX && gameMap[(this.positionY*mapH)+this.positionX-1]){
             // CURRENT POSITION BECOMES TRAVERSABLE AND CHAIR IS REMOVED
-            gameMap[((this.positionY)*mapH)+(this.positionX)] = 1;
-            ctx.drawImage(this.img,barFloor2Index.x,barFloor2Index.y,barFloor2Index.w, barFloor2Index.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
+            this.clearChairFrame();
             // UPDATE THE NEW POSITION
             this.positionX --;
             // NEW POSITION IS NON-TRAVERSABLE
@@ -556,8 +574,7 @@ class Chair {
     moveRight(){
         if (this.positionX < mapW-1 && gameMap[(this.positionY*mapH)+this.positionX+1]){
             // CURRENT POSITION BECOMES TRAVERSABLE
-            gameMap[((this.positionY)*mapH)+(this.positionX)] = 1;
-            ctx.drawImage(this.img,barFloor2Index.x,barFloor2Index.y,barFloor2Index.w, barFloor2Index.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
+            this.clearChairFrame();
             // UPDATE THE NEW POSITION
             this.positionX ++;
             // NEW POSITION IS NON-TRAVERSABLE
@@ -567,8 +584,7 @@ class Chair {
     moveUp(){
         if (this.positionY && gameMap[((this.positionY-1)*mapH)+this.positionX]){
             // CURRENT POSITION BECOMES TRAVERSABLE
-            gameMap[((this.positionY)*mapH)+(this.positionX)] = 1;
-            ctx.drawImage(this.img,barFloor2Index.x,barFloor2Index.y,barFloor2Index.w, barFloor2Index.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
+            this.clearChairFrame();
             // UPDATE THE NEW POSITION
             this.positionY --;
             // NEW POSITION IS NON-TRAVERSABLE
@@ -578,49 +594,54 @@ class Chair {
     moveDown(){
         if (this.positionY < mapH -1 && gameMap[((this.positionY+1)*mapH)+this.positionX]){
             // CURRENT POSITION BECOMES TRAVERSABLE
-            gameMap[((this.positionY)*mapH)+(this.positionX)] = 1;
-            ctx.drawImage(this.img,barFloor2Index.x,barFloor2Index.y,barFloor2Index.w, barFloor2Index.h, this.positionX*tileW, this.positionY*tileH, 40, 40);
+            this.clearChairFrame();
             // UPDATE THE NEW POSITION
             this.positionY ++;
             // NEW POSITION IS NON-TRAVERSABLE
             gameMap[((this.positionY)*mapH)+(this.positionX)] = 0;
         }
     }
-    trajectory(chairIndex, velX, velY){
+    trajectory(velX, velY){
         console.log("THE CHAIR WAS KICKED!")
-
-        // SET UP CHAIR OBJECT VARIABLE
-        let chairObj = null;
         
         let interval = setInterval(() => {
-            console.log(`Chair #${chairIndex} is at [${chairs[chairIndex].positionX},${chairs[chairIndex].positionY}]`)
-            chairObj = chairs[chairIndex];
-            chairObj.velocityX = velX;
-            chairObj.velocityY = velY;
-
-            // DESTROY THIS CHAIR IF NEXT POSITION IS OCCUPIED
-            if (!gameMap[((chairObj.positionY+chairObj.velocityY)*mapH)+(chairObj.positionX+chairObj.velocityX)]){
-                // CHECK IF SAID POSITION IS THE ENEMY
-                if (chairObj.positionX+velX == enemy.positionX && chairObj.positionY+velY == enemy.positionY && !enemy.destroyed){
+            
+            this.velocityX = velX;
+            this.velocityY = velY;
+            let chairParams = {
+                posX: this.positionX,
+                posY: this.positionY,
+                velX: this.velocityX,
+                velY: this.velocityY,
+            }
+            // IF EDGE OF SCREEN, DESTROY
+            if (this.edgeOfScreen(chairParams)){
+                this.clearChairFrame();
+                clearInterval(interval);
+                chairs.splice(chairs.findIndex(chair => chair.positionX == this.positionX && chair.positionY == this.positionY),1);
+            // DESTROY IF THERE IS A COLLISION IN THE NEXT SPOT
+            } else if (!gameMap[((this.positionY+this.velocityY)*mapH)+(this.positionX+this.velocityX)]){
+                if (this.positionX+velX == enemy.positionX && this.positionY+velY == enemy.positionY && !enemy.destroyed){
                     enemy.health --;
                     $('#enemyHealth').text(`Enemy Health: ${enemy.health}`);
                     if (!enemy.health){
-                        ctx.drawImage(this.img,barFloor2Index.x,barFloor2Index.y,barFloor2Index.w, barFloor2Index.h, (chairObj.positionX+velX)*tileW, (chairObj.positionY+velY)*tileH, 40, 40);
+                        // this.clearChairFrame();
+                        enemy.destroy();
                         gameMap[((enemy.positionY)*mapH)+(enemy.positionX)] = 1;
-                    }
-                }
-                ctx.drawImage(this.img,barFloor2Index.x,barFloor2Index.y,barFloor2Index.w, barFloor2Index.h, (chairObj.positionX)*tileW, (chairObj.positionY)*tileH, 40, 40);
+                    };
+                // HITS OTHER SURFACE
+                };
+                this.clearChairFrame();
                 clearInterval(interval);
-                gameMap[((chairObj.positionY)*mapH)+(chairObj.positionX)] = 1;
-                chairs[chairIndex].destroyed = true;
-            } 
-            // MOVE CHAIR IF NOT DESTROYED AND UPDATE COLLSION
-            else {
-                gameMap[((chairObj.positionY)*mapH)+(chairObj.positionX)] = 1;
-                ctx.drawImage(this.img,barFloor2Index.x,barFloor2Index.y,barFloor2Index.w, barFloor2Index.h, (chairObj.positionX)*tileW, (chairObj.positionY)*tileH, 40, 40);
+                console.log(`Before splice: ${chairs}`);
+                chairs.splice(chairs.findIndex(chair => chair.positionX == this.positionX && chair.positionY == this.positionY),1);
+                console.log(`After splice: ${chairs}`);
+            // NO COLLISION, SO MOVE CHAIR
+            } else {
+                this.clearChairFrame();
                 this.positionX += velX;
                 this.positionY += velY;
-                gameMap[((chairObj.positionY)*mapH)+(chairObj.positionX)] = 0;
+                gameMap[((this.positionY)*mapH)+(this.positionX)] = 0;
             }
         },100)
     }
